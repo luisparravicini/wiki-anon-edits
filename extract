@@ -1,0 +1,19 @@
+#!/bin/bash
+
+extract=extract.log
+error=error.log
+stats=stats.log
+
+# remove logs and output dir from previous runs
+for log in $extract $error $stats; do
+  [ -f $log ] && rm $log
+done
+rm -rf data
+
+# compile if necesary
+jar_dir=dump_reader
+jar=$jar_dir/dist/dump-reader.jar
+[ -f $jar_dir/$jar ] || (cd $jar_dir && ant)
+
+(7z e -so enwiki-latest-pages-meta-history.xml.7z | java -server -cp $jar XmlDumpReader) 2>$error
+
